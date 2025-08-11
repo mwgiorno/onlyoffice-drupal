@@ -33,6 +33,7 @@ jobs:
           rm -rf ./.github/
           rm -rf ./.git/
           rm ./.gitignore
+          rm ./README.md
           cd $cwd
       - name: Pack Artifact
         run: zip -r onlyoffice-drupal-${{ steps.info.outputs.version }}.zip onlyoffice-drupal
