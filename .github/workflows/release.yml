@@ -18,6 +18,9 @@ jobs:
         run: |
           echo "version=$(grep -Eo '[0-9]+(\.[0-9]+)+' CHANGELOG.md | head -n 1)" >> $GITHUB_OUTPUT
         id: info
+      - name: Generate Changelog
+        run: |
+          awk '/## [0-9]/{p++} p; /## [0-9]/{if (p > 1) exit}' CHANGELOG.md | awk 'NR>2 {print last} {last=$0}' > RELEASE.md
       - name: Build Artifact
         run: |
           cd ${{ github.workspace }}
@@ -30,10 +33,11 @@ jobs:
           rm ./.gitignore
           cd $cwd
       - name: Pack Artifact
-        run: zip -r onlyoffice-drupal-${{ steps.info.outputs.version }}.zip onlyoffice-drupal
+        run: zip -r onlyoffice-drupal-${{ steps.info.outputs.version }}.zip onlyoffice-drupal -x RELEASE.md
       - name: Create Release
         uses: ncipollo/release-action@v1
         id: create_release
         with:
           artifacts: "onlyoffice-drupal-${{ steps.info.outputs.version }}.zip"
+          bodyFile: RELEASE.md
           tag: v${{ steps.info.outputs.version }}
